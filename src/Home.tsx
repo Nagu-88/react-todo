@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
-import   {authContext}   from "./Auth";
+import { Context } from "./context";
 import {useContext} from "react";
 
 export const Home = () => {
   const navigate = useNavigate();
-  const {logout} = useContext(authContext);
+  const { logout } = useContext(Context);
 
   return (
     <div>

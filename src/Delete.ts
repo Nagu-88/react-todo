@@ -1,17 +1,20 @@
-import { useContext, useEffect } from "react";
+import { useEffect, useContext} from "react";
 import { Context } from "./context";
+// import { useRecordManagement } from "./Reducer";
 
 export const useDeleteRow = () => {
-  const { records, handleDelete } = useContext(Context);
+  // const {  handleDelete, records } = useRecordManagement();
+  // const {handleDelete, records} = useContext(Context)
+  const { handleDelete, records } = useContext(Context);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (records.length > 0) {
         const index = Math.floor(Math.random() * records.length);
         const recordToDelete = records[index];
-        handleDelete(recordToDelete, records);
+        handleDelete(recordToDelete);
       }
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
   }, [records, handleDelete]);
 };

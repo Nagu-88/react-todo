@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState,useContext } from "react";
 import { Record } from "./App";
-import { Context } from "./context";
 import { Button, TextField, Typography, Box } from "@mui/material";
 import {
   Table,
@@ -9,57 +8,39 @@ import {
   TableRow,
   TableHead
 } from "@mui/material";
-import { useContext } from "react";
-import {useDeleteRow} from "./Delete"; 
-
-// interface displayProps {
-//   // records: Record[];
-//     onUpdate: (record: Record) => void;
-//     onDelete: (record: Record) => void;
-// }
+// import { useRecordManagement } from "./Reducer";
+import { useDeleteRow } from "./Delete";
+import { Context } from "./context";
 
 export const Display = () => {
-  // const {  onUpdate, onDelete } = props;
-  // const { records } = props;
 
-  // const { handleUpdate, handleDelete } = useContext(Context);
-  const { records, handleUpdate, handleDelete } = useContext(Context);
+  const { handleUpdate, handleDelete, records } = useContext(Context);
 
-  // const [editName, setEditName] = useState<Record | "">("");
   const [editRecord, setEditRecord] = useState<Record>({
     id: 0,
     name: '',
     city: ''
   });
-  const {id:editRecordId} = editRecord;
-  const [error, setError] = useState(false);
+  const { id: editRecordId } = editRecord;
   const [newName, setnewName] = useState<string>("");
   const [newCity, setnewCity] = useState<string>("");
   useDeleteRow();
-  // const [data, setData] = useState<any>([]);
 
-  // const editId = editName !== "" ? editName.id : null;
-  // const regex = /^[a-zA-Z\s]*$/;
-
-  const handleSave = (event: any, record: Record) => {
-    event.preventDefault();
+  const handleSave = (record: Record) => {
     const { id } = record;
     console.log("display", record);
     const updateData = {
       id: id,
-      name:newName,
+      name: newName,
       city: newCity,
     };
-    // onUpdate(updateData);
-    handleUpdate(updateData, records);
+    handleUpdate(updateData);
     setEditRecord({ id: 0, name: '', city: '' });
   };
 
   const handleEdit = (record: Record) => {
     const { name, city } = record;
-     console.log(record);
     setEditRecord(record);
-    // setUpdatedRecord({ newName: name, newCity:city });
     setnewName(name);
     setnewCity(city);
   };
@@ -69,8 +50,7 @@ export const Display = () => {
   };
 
   const handleDeleteRecord = (record: Record) => {
-    // onDelete(record);
-    handleDelete(record, records);
+    handleDelete(record);
   };
 
   return (
@@ -111,10 +91,6 @@ export const Display = () => {
                       label="Name"
                       placeholder="Enter Name for Record"
                       onChange={(event) => setnewName(event.target.value)}
-                      error={error}
-                      helperText={
-                        error ? "Please enter alphabetic characters only" : ""
-                      }
                     />
                   </TableCell>
                 ) : (
@@ -130,10 +106,6 @@ export const Display = () => {
                       label="city"
                       placeholder="Enter Name for Record"
                       onChange={(event) => setnewCity(event.target.value)}
-                      error={error}
-                      helperText={
-                        error ? "Please enter alphabetic characters only" : ""
-                      }
                     />
                   </TableCell>
 
@@ -143,7 +115,7 @@ export const Display = () => {
                 <TableCell>
                   {editRecord && editRecordId === recordId ? (
                     <>
-                      <Button onClick={(event) => handleSave(event, record)}>
+                      <Button onClick={() => handleSave(record)}>
                         Save
                       </Button>
                       <Button type="button" onClick={handleCancel}>
@@ -154,13 +126,11 @@ export const Display = () => {
                     <>
                       <Button
                         onClick={() => handleEdit(record)}
-                        className="editButton"
                       >
                         Edit
                       </Button>
                       <Button
                         onClick={() => handleDeleteRecord(record)}
-                        className="deleteButton"
                       >
                         Delete
                       </Button>

@@ -1,79 +1,35 @@
 import { v4 as uuid } from "uuid";
-import { Button, TextField, Box, Typography } from "@mui/material";
-import { Context } from "./context";
+import { Button, TextField, Box, Typography, FormControl } from "@mui/material";
 import { Display } from "./Display";
-import { useContext, useEffect, useState } from "react";
-import {Link} from "react-router-dom";
-
-// interface Props {
-//   save: (record: { id: number; name: string }) => void;
-// }
+import { useState, useContext } from "react";
+import { Context } from "./context";
+// import { useRecordManagement } from "./Reducer";
 
 export const Add = () => {
-  const { handleSave,saveAPIData } = useContext(Context);
+  // const { handleSave,  successMessage } = useRecordManagement();
+  const {handleSave, successMessage} = useContext(Context);
 
-  const [name, setName] = useState({name:"", city:""});
-  const [successMessage, setSuccessMessage] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [name, setName] = useState({ name: "", city: "" });
 
   const uniqueId = uuid();
-
-  const regex = /^[a-zA-Z/s]*$/;
-
   const handleChange = (event: any) => {
     event.preventDefault();
-    // if (event.target.value.match(regex)) {
-      // setError(false);
-      // setErrorMessage("");
-      // setName(event.target.value);
-      const { name, value } = event.target;
-      setName((prevFormData: any) => ({
-            ...prevFormData,
-            [name]: value
-          }));
-    
-      setSuccessMessage(false);
-    // } else {
-    //   setError(true);
-    //   setErrorMessage("Please enter alphabetic characters only");
-    // }
+    const { name, value } = event.target;
+    setName((prevFormData: any) => ({
+      ...prevFormData,
+      [name]: value
+    }));
   };
 
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
+  const handleSubmit = () => {
     const newData = {
       id: parseInt(uniqueId, 10),
       name: name.name,
-      city:name.city
+      city: name.city
     };
-    // props.save(newData);
     handleSave(newData);
-    setName({name:"", city:""});
-    setSuccessMessage(true);
+    setName({ name: "", city: "" });
   };
-
-  const fetchData = async () => {
-    const response = await fetch('https://mocki.io/v1/d4867d8b-b5d5-4a48-a4ab-79131b5809b8')
-    if (!response.ok) {
-      throw new Error('Data could not be fetched!')
-    } else {
-      return response.json()
-    }
-  }
-
-  useEffect(() => {
-   
-      fetchData()
-        .then((res: any) => {
-          
-          saveAPIData(res);
-        })
-        .catch((error: any) => {
-          console.log(error.message)
-        })
-    
-  }, [])
 
   return (
     <>
@@ -85,7 +41,7 @@ export const Add = () => {
           alignItems: "center"
         }}
       >
-        <form>
+        <FormControl>
           <TextField
             type="text"
             margin="normal"
@@ -94,10 +50,7 @@ export const Add = () => {
             label="Name"
             placeholder="Enter Name for Record"
             onChange={handleChange}
-            error={error}
-            helperText={errorMessage}
           />
-          <br />
           <TextField
             type="text"
             margin="normal"
@@ -106,19 +59,12 @@ export const Add = () => {
             label="City"
             placeholder="Enter city for Record"
             onChange={handleChange}
-            error={error}
-            helperText={errorMessage}
           />
           {successMessage && (
             <Typography>Record added Successfully!</Typography>
           )}
-          <br />
-
           <Button onClick={handleSubmit}>Submit</Button>
-          <br />
-
-          {/* <Link to="/display">LIST OF RECORDS</Link> */}
-        </form>
+        </FormControl>
       </Box>
       <div>
         <Display />

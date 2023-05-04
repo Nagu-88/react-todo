@@ -1,11 +1,11 @@
-import { Button, TextField, Box } from "@mui/material";
+import { Button, TextField, Box, FormControl } from "@mui/material";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import  {authContext}  from "./Auth";
+import { Context } from "./context";
 import { users } from "./user";
 
 export const LoginPage = () => {
-  const [loginDetails, setLoginDetails] = useState({
+  const [loginFormData, setLoginFormData] = useState({
     email: "",
     password: ""
   });
@@ -13,37 +13,27 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
-  const {login} = useContext(authContext);
+  const { login } = useContext(Context);
 
-  
 
   const handleChange = (event: any) => {
-    const {name, value} = event.target;
+    const { name, value } = event.target;
     setError(false);
-    setLoginDetails((prevFormData) => ({
+    setLoginFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value
     }));
   }
 
-  const handleLogin = (event: any) => {
-    event.preventDefault();
-    console.log("users", users);
-    const loginUser = users.find(
-      (user: { email: string; password: string }) => user.email === loginDetails.email
+  const handleLogin = (loginFormData: { email: string, password: string }) => {
+    const { email, password } = loginFormData;
+    const loginCredentials = users.find(
+      (userLoginDetails: { email: string; password: string }) => userLoginDetails.email === email && userLoginDetails.password === password
     );
-    console.log("login", loginUser);
-    if (loginUser) {
+    if (loginCredentials) {
       setError(false);
       setErrorMessage("");
-    } else {
-      setError(true);
-      setErrorMessage("Invalid email or password");
-    }
-    if (loginUser && loginUser.password === loginDetails.password) {
-      setError(false);
-      setErrorMessage("");
-      login(loginUser, () => {
+      login(loginCredentials, () => {
         navigate("/home");
       });
     } else {
@@ -62,32 +52,31 @@ export const LoginPage = () => {
           alignItems: "center",
         }}
       >
-        <form>
+        <FormControl>
           <TextField
             type="text"
             margin="normal"
             name="email"
-            value={loginDetails.email}
+            value={loginFormData.email}
             label="Email"
             placeholder="Enter Email"
             onChange={handleChange}
           />
-          <br />
+
           <TextField
             type="password"
             margin="normal"
             name="password"
-            value={loginDetails.password}
+            value={loginFormData.password}
             label="Password"
             placeholder="Enter Password"
             onChange={handleChange}
           />
           {error && <p style={{ color: "red" }}>{errorMessage}</p>}
-          <br />
-          <Button  onClick={handleLogin}>
+          <Button onClick={() => { handleLogin(loginFormData) }}>
             Login
           </Button>
-        </form>
+        </FormControl>
       </Box>
     </>
   );

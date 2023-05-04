@@ -1,65 +1,53 @@
 import { createContext, useState, ReactNode } from "react";
 import { Record } from "./App";
-import { v4 as uuidv4 } from 'uuid';
+import { useRecordManagement } from "./Reducer";
 
 type ContextType = {
   records: Record[];
-  handleUpdate: (updatedRecord: Record, prevRecords: Record[]) => void;
-  handleDelete: (deleteRecord: Record, prevRecords: Record[]) => void;
-  handleSave: (record: { id: number; name: string, city:string }) => void;
-  saveAPIData: (data: any) => void;
+  handleUpdate: (updatedRecord: Record) => void;
+  handleDelete: (deletedRecord: Record) => void;
+  handleSave: (newRecord: Record) => void;
+  userDetails: {email: string, password: string} ;
+  login: (user:{email: string, password: string}, callback: VoidFunction) => void;
+  logout: (callback: VoidFunction) => void;
+  successMessage: boolean;
 };
 
 export const Context = createContext<ContextType>({
   records: [],
-  handleUpdate: () => {},
-  handleDelete: () => {},
-  handleSave: () => {},
-  saveAPIData: () => {}
+  handleUpdate: () => { },
+  handleDelete: () => { },
+  handleSave: () => { },
+  userDetails: {email:"",password:""},
+  login: () => { },
+  logout: () => { },
+  successMessage: false
+  
+
 });
 
 export const RecordContext = ({ children }: { children: ReactNode }) => {
-  const [records, setRecords] = useState<Record[]>([]);
+  const { handleSave, handleUpdate, handleDelete, records, successMessage } = useRecordManagement();
 
-  const handleSave = (currentrecord: Record) => {
-    const recordsClone = [...records];
-    recordsClone.push(currentrecord);
-    setRecords(recordsClone);
+  const [userDetails, setUserDetails] = useState({ email: "" ,password: "" });
+    
+  const login = (loginCredentials: { email: string; password: string }, callback: VoidFunction) => {
+    setUserDetails(loginCredentials);
+     callback();
   };
 
-  const handleUpdate = (updatedRecord: Record, prevRecords: Record[]) => {
-    const { id, name } = updatedRecord;
-    const updatedData = prevRecords.map((item) => {
-      const { id: itemId } = item;
-      const cloneRecord = { ...item };
-      if (itemId === id) {
-        // return { ...item, name: name };
-        return { ...cloneRecord, name: name };
-      }
-      return cloneRecord;
-    });
-    setRecords(updatedData);
-  };
+  const logout = (callback: VoidFunction) => {
+    setUserDetails({ email: "" ,password: "" });
+     callback();
 
-  const handleDelete = (deleteRecord: Record, prevRecords: Record[]) => {
-    const { id } = deleteRecord;
-    const filteredRecords = prevRecords.filter(
-      ({ id: itemId }) => itemId !== id
-    );
-    setRecords(filteredRecords);
-  };
-
-  const saveAPIData = (data:any) => {
-    const recordsWithId = data.map((record:any) => {
-      return { ...record, id: uuidv4() };
-    });
-    setRecords(recordsWithId);
-  };
+  }
 
   return (
     <Context.Provider
-      value={{ records, handleSave, handleUpdate, handleDelete, saveAPIData }}
-    >
+        value={{
+          records, handleSave, handleUpdate, handleDelete, successMessage, userDetails, login, logout
+        }}
+      >
       {children}
     </Context.Provider>
   );
